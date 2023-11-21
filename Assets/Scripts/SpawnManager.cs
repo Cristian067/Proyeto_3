@@ -19,6 +19,8 @@ public class SpawnManager : MonoBehaviour
 
     private Vector3 spawnPos;
 
+    private PlayerControl playerControl;
+
 
     private void Awake()
     {
@@ -28,7 +30,9 @@ public class SpawnManager : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
+
     {
+        playerControl = FindAnyObjectByType<PlayerControl>();
 
         InvokeRepeating("obstacles", startTime, delayTime);
         
@@ -37,14 +41,22 @@ public class SpawnManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (playerControl.isGameOver)
+        {
+            CancelInvoke("obstacles");
+        }
     
     }
 
 
     private void obstacles()
     {
-        Instantiate(obstacle[Random.Range(0,obstacle.Length)], spawnPos, Quaternion.identity);
+        
+
+            Instantiate(obstacle[Random.Range(0, obstacle.Length)], spawnPos, Quaternion.identity);
+
+        
+        
     }
 
 

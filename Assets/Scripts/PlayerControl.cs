@@ -12,6 +12,9 @@ public class PlayerControl : MonoBehaviour
     private float jumpForce = 8;
 
 
+    public bool isGameOver;
+
+
 
 
 
@@ -19,6 +22,7 @@ public class PlayerControl : MonoBehaviour
     {
         playerRB = GetComponent<Rigidbody>();
         isOnGround = true;
+        isGameOver = false;
     }
 
 
@@ -61,8 +65,18 @@ public class PlayerControl : MonoBehaviour
             isOnGround = true;
         
         }
+
+        if (collision.gameObject.tag == "Obstacle")
+        {
+            Debug.Log("Game Over");
+            //Time.timeScale  = 0;
+            isGameOver = true;
+
+        }
         
     }
+
+    
 
 
 

@@ -34,6 +34,8 @@ public class SpawnManager : MonoBehaviour
     {
         playerControl = FindAnyObjectByType<PlayerControl>();
 
+        //Debug.Log(playerControl.isGameOver);
+
         InvokeRepeating("obstacles", startTime, delayTime);
         
     }

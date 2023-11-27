@@ -1,18 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerControl : MonoBehaviour
 {
 
     private Rigidbody playerRB;
 
+    private Animator animator;
+
     private bool isOnGround;
 
-    private float jumpForce = 8;
+    private float jumpForce = 8f;
 
 
     public bool isGameOver;
+
+    [SerializeField] private ParticleSystem deathP;
+    [SerializeField] private ParticleSystem dirt;
 
 
 
@@ -21,6 +28,7 @@ public class PlayerControl : MonoBehaviour
     private void Awake()
     {
         playerRB = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
         isOnGround = true;
         isGameOver = false;
     }
@@ -41,16 +49,24 @@ public class PlayerControl : MonoBehaviour
         {
             jump();
         }
+
+        if (Input.GetKeyDown("r"))
+        {
+            SceneManager.LoadScene("Prototype 3");
+        }
         
     }
 
 
     private void jump()
     {
-        if (isOnGround)
+        if (isOnGround && !isGameOver)
         {
             playerRB.AddForce(new Vector3(0, 1, 0) * jumpForce, ForceMode.Impulse);
             isOnGround = false;
+            animator.SetTrigger("Jump_trig");
+            dirt.Stop();
+
         }
         
         
@@ -63,17 +79,34 @@ public class PlayerControl : MonoBehaviour
         {
 
             isOnGround = true;
+            dirt.Play();
+
         
         }
 
         if (collision.gameObject.tag == "Obstacle")
         {
-            Debug.Log("Game Over");
-            //Time.timeScale  = 0;
-            isGameOver = true;
+            
+            death();
 
         }
+
+
         
+        
+    }
+
+    private void death()
+    {
+
+        Debug.Log("Game Over");
+        //Time.timeScale  = 0;
+        isGameOver = true;
+        animator.SetBool("Death_b",true);
+        deathP.Play();
+        
+
+
     }
 
     

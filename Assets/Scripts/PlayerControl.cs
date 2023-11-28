@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class PlayerControl : MonoBehaviour
 {
@@ -11,17 +13,32 @@ public class PlayerControl : MonoBehaviour
 
     private Animator animator;
 
+    private AudioSource audio;
+
+    
+
+
+    [SerializeField] private AudioClip jumpClip;
+    [SerializeField] private AudioClip deathClip;
+
+
     private bool isOnGround;
 
     private float jumpForce = 8f;
 
+    [SerializeField] private float vol = 0.5f;
 
     public bool isGameOver;
 
     [SerializeField] private ParticleSystem deathP;
     [SerializeField] private ParticleSystem dirt;
 
+    [SerializeField] private AudioSource cameraAudio;
 
+
+    private int lives = 3;
+
+    public TMP_Text contadorLives;
 
 
 
@@ -29,8 +46,10 @@ public class PlayerControl : MonoBehaviour
     {
         playerRB = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+        audio = GetComponent<AudioSource>();
         isOnGround = true;
         isGameOver = false;
+        
     }
 
 
@@ -38,12 +57,26 @@ public class PlayerControl : MonoBehaviour
     void Start()
     {
         //playerRB.AddForce(new Vector3(0,1,0) * 10, ForceMode.Impulse);
+
+        
+
         
     }
 
     // Update is called once per frame
     void Update()
     {
+
+        contadorLives.text = $"Lives{lives}";
+
+
+        if(!isGameOver)
+        {
+
+            cameraAudio.volume = vol;
+
+        }
+        
 
         if (Input.GetKeyDown("space") && isOnGround)
         {
@@ -65,6 +98,7 @@ public class PlayerControl : MonoBehaviour
             playerRB.AddForce(new Vector3(0, 1, 0) * jumpForce, ForceMode.Impulse);
             isOnGround = false;
             animator.SetTrigger("Jump_trig");
+            audio.PlayOneShot(deathClip, vol);
             dirt.Stop();
 
         }
@@ -75,7 +109,7 @@ public class PlayerControl : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
 
-        if (collision.gameObject.tag == "Ground") 
+        if (collision.gameObject.tag == "Ground" && !isGameOver) 
         {
 
             isOnGround = true;
@@ -86,8 +120,14 @@ public class PlayerControl : MonoBehaviour
 
         if (collision.gameObject.tag == "Obstacle")
         {
+
+            lives--;
+            if (lives < 0)
+            {
+                death();
+            }
             
-            death();
+            
 
         }
 
@@ -104,6 +144,9 @@ public class PlayerControl : MonoBehaviour
         isGameOver = true;
         animator.SetBool("Death_b",true);
         deathP.Play();
+        audio.PlayOneShot(deathClip, vol);
+        cameraAudio.volume = 0.01f;
+        dirt.Stop();
         
 
 
